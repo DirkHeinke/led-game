@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="game.css">
+    <title>LED Racer</title>
+  </head>
+  <body>
+    <h1 style="text-align: center">UnFinity</h1>
+    <div id="gameField">
+        <!-- <div class="row">
+            <div class="player" id="player_x">
+        </div> -->
+        <div id="finishLine"></div>
+    </div>
+    <br>
+    <div id="goDiv" onclick=run()>Los!</div>
+    <div id="winningScreen">
+        <h2>Gewinner</h2>
+        <ul>
+            <!-- <li>Player_x</li> -->
+        </ul>
+        <div id="closeDiv" onclick="closeGame()">Ende</div>
+    </div>
+    <script>window.$ = window.jQuery = require('./node_modules/jquery/dist/jquery.min');</script>
+    
+    <script>
+    function Player (id, name) {
+        this.x = 0,
+        this.id = id,
+        this.name = name
+    }
+    
+    let playerCount;
+    let players = [];
+    let port;
+    let gameState = "setup";
+    const remote = require('electron').remote; 
+
+    
+    function pad(n, width, z) {
+      z = z || '0';
+      n = n + '';
+      return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+    }
+    
+    function init(number, serialPath) {
+        playerCount = number;
+        console.log(number, serialPath);
+        
+        for(let i = 0; i < number; i++) {
+            // $("#gameField").append('<div class="gameRow"><div class="player" id="player_' + i +'"></div>');
+            $("#gameField").append('<div class="gameRow"><img class="spaceship" src="spacecraft_red.png" id="player_' + i +'"></div>');
+            let p = new Player(i, "Spieler_" + i);
+            players.push(p);
+        }
+        
+        const SerialPort = require('serialport');
+        const Readline = SerialPort.parsers.Readline;
+        port = new SerialPort(serialPath);
+        const parser = new Readline();
+        port.pipe(parser);
+        parser.on('data', handleData);
+        
+        port.open(() => {
+            port.write(`init ${pad(number,2)} \n`);
+        })
+    }
+    
+    function getHue(red, green, blue) {
+
+        const min = Math.min(Math.min(red, green), blue);
+        const max = Math.max(Math.max(red, green), blue);
+
+        let hue = 0.0;
+        if (max == red) {
+            hue = (green - blue) / (max - min);
+
+        } else if (max == green) {
+            hue = 2.0 + (blue - red) / (max - min);
+
+        } else {
+            hue = 4.0 + (red - green) / (max - min);
+        }
+
+        hue = hue * 60;
+        if (hue < 0) hue = hue + 360;
+
+        return Math.round(hue);
+    }
+    
+    
+    function run() {
+        port.write('start\n');
+        $("#goDiv").css("display", "none");
+    }
+        
+    function handleData(data) {
+        console.log(data, playerCount);
+        // m:1,0,2,2
+        if(data.startsWith("m:")) {
+            let moveData = data.substr(2).split(',');
+            
+            if(moveData.length != playerCount) {
+                return;
+            }
+            console.log(moveData);
+            
+            for(let i = 0; i < playerCount; i++) {
+                let movmentData = parseFloat(moveData[i]);
+                if(getPlayerById(i).x + movmentData >= 97) {
+                    getPlayerById(i).x = 97;
+                } else {
+                    getPlayerById(i).x += parseFloat(moveData[i]);
+                }
+            }
+            
+            drawPlayers();
+            let winners = checkWinners();
+            if(winners.length > 0) {
+                console.log(winners);
+                port.write("end\n");
+                //  show winner
+                $("#winningScreen").css("display", "block");
+                winners.forEach((winner) => {
+                    $("#winningScreen ul").append(`<li>${winner.name}</li>`);
+                });
+            }
+            
+        } else if(data.startsWith("ready")) {
+            data = data.trim();
+            let colors = data.substr(6).split(',');
+            if(colors.length != playerCount) {
+                console.log("Not enough entries");
+                return;
+            }
+            let error = false;
+            let newColors = [];
+            colors.forEach(function(entry) {
+                if(entry.length != 9) {
+                    console.log("Invalid Color", entry, entry.length);
+                    console.log(entry[9]);
+                    error = true;
+                    return;
+                }
+                
+                newColors.push(entry.match(/.{1,3}/g));
+            })
+            
+            if(error) {
+                return;
+            }
+            
+            
+            applyColors(newColors);
+            
+            console.log(newColors);
+        }
+    }
+    
+    function closeGame() {
+        console.log("End");
+        const window = remote.getCurrentWindow();
+        window.close();
+    }
+    
+    function applyColors(colors) {
+        players.forEach(function(player) {
+            hue = getHue(colors[player.id][0], colors[player.id][1], colors[player.id][2]);
+            $('#player_' + player.id).css("filter", `hue-rotate(${hue}deg)`);
+        })
+    }
+    
+    function checkWinners() {
+        let winners = [];
+        players.forEach(function(player) {
+            if(player.x >= 95) {
+                winners.push(player);
+            }
+        })
+        
+        return winners;
+    }
+    
+    function drawPlayers() {
+        players.forEach(function(player) {
+            $('#player_' + player.id).animate({
+                left: player.x + "%"
+            }, 1000);
+        })
+    }
+    
+    function getPlayerById(id) {
+        for(let i = 0; players.length; i++) {
+            if(players[i].id == id) {
+                return players[i];
+            }
+        }
+    }
+    
+    </script>
+    
+  </body>
+</html>

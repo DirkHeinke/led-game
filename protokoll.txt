@@ -1,0 +1,18 @@
+> init XX
+    XX (1-99) Spieler die Farbe aussuchen lassen
+< ready RRRGGGBBB,RRRGGGBBB,...
+    Pro Spieler die Farbe die er hat, zurück geben
+> start
+    Spiel starten
+< m:X,X,X
+    Punkt die der Spieler bekommen hat. Float zwischen 0.0 - 95.0
+    Bei insgesamt 95 Punkten hat der Spieler gewonnen
+    Diesen Befehl 1x pro Sekunde senden, bis das Spiel zuende ist
+    Hinweis: 0 heißt die Figur bewegt sicht nicht, daher sollte dies nur 
+        passieren, wenn der Spieler falsch gedrück hat, hat der Spieler
+        nicht gedrückt, z.B. 1
+< m:X,X,...
+< m:X,X,...
+< m:X,X,...
+> end XX[,XX,...]
+    Spiel beendet, Spieler ID X,.. haben gewonnen

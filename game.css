@@ -1,0 +1,84 @@
+body {
+    background-color: black;
+    overflow: hidden;
+}
+
+h1 {
+    color: lightgray;
+}
+
+.gameRow {
+    height: 50px;
+    display: flex;
+    align-items: center;
+    border: grey 1px solid
+}
+
+.gameRow:nth-child(even) {
+    /*background-color: green;*/
+}
+
+.gameRow:nth-child(odd) {
+    /*background-color: greenyellow;*/
+}
+
+.player {
+    width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    background-color: red;
+    position: relative;
+}
+
+#gameField {
+    position: relative;
+}
+
+#finishLine {
+    background-color: #eee;
+    background-image: linear-gradient(45deg, black 25%, transparent 25%, transparent 75%, black 75%, black), 
+    linear-gradient(45deg, black 25%, transparent 25%, transparent 75%, black 75%, black);
+    background-size:30px 30px;
+    background-position:0 0, 15px 15px;
+    width: 30px;
+    position: absolute;
+    height: 100%;
+    left: 95%;
+}
+
+.spaceship {
+    /*filter: hue-rotate(240deg);*/
+    height: 60px;
+    transform: rotate(90deg);
+    position: relative;
+
+}
+
+#goDiv {
+    background-color: lightgray;
+    border-radius: 10px;
+    text-align: center;
+    width: 50px;
+    cursor: pointer;
+}
+
+#winningScreen {
+    background-color: lightgray;
+    border-radius: 10px;
+    text-align: center;
+    padding: 10px;
+    width: 30%;
+    position: absolute;
+    top: 100px;
+    left: 34%;
+    display: none;
+}
+
+#winningScreen ul {
+    padding: 0;
+}
+
+#closeDiv {
+    background-color: darkgrey;
+    cursor: pointer;
+}

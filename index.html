@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <title>LED Racer</title>
+  </head>
+  <body style="text-align: center">
+    <h1>UnFinity - Settings</h1>
+    Spieler: <input id='playerCount' type="number"> <br>
+    Port: <input type='text' id='portSelection' list="portData"/> <br>
+    <datalist id='portData'>
+    </datalist><br>
+    <button onclick="startGame()">Einrichten</button>
+    
+
+
+    
+    
+             <script>
+             
+                    const SerialPort = require('serialport');
+                    SerialPort.list((err,data) => {
+                        data.forEach((entry) => {
+                            $('#portData').append(`<option>${entry.comName}</option>`)
+                        })
+                        
+                    })
+             
+             
+             
+                    function startGame() {
+                        const {ipcRenderer} = require('electron');
+                        let number = document.getElementById("playerCount").value;
+                        if(number > 99 || number < 1) {
+                            alert("Anzahl Spieler muss zwischen 1 und 99 sein");
+                            return;
+                        }
+                        let port = document.getElementById("portSelection").value;
+                        data = {"number": number, "port": port};
+                        ipcRenderer.send('ui', 'setup', data);
+                        // ipcRenderer.send('ui', 'startGame');
+                        
+                    // const remote = require('electron').remote;
+                    // const BrowserWindow = remote.BrowserWindow;
+
+                    // var win = new BrowserWindow({ width: 800, height: 600 , fullscreen: true});
+                    }
+            </script> 
+    
+    <script>window.$ = window.jQuery = require('./node_modules/jquery/dist/jquery.min');</script>
+
+    <script src="./node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+
+    
+  </body>
+</html>
