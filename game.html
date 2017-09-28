@@ -52,7 +52,7 @@
         for(let i = 0; i < number; i++) {
             // $("#gameField").append('<div class="gameRow"><div class="player" id="player_' + i +'"></div>');
             $("#gameField").append('<div class="gameRow"><img class="spaceship" src="spacecraft_red.png" id="player_' + i +'"></div>');
-            let p = new Player(i, "Spieler_" + i);
+            let p = new Player(i, "Spieler " + (i+1));
             players.push(p);
         }
         

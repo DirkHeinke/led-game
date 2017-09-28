@@ -77,7 +77,7 @@ function setupNewGame(args) {
       slashes: true
     }))
     gameWindow.setMenu(null);
-    gameWindow.webContents.openDevTools()
+    // gameWindow.webContents.openDevTools()
 
     
     gameWindow.webContents.executeJavaScript(`init('${playerCount}', '${port}')`);
